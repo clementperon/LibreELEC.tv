@@ -1,4 +1,4 @@
-From 443ca53cf78c635aa5bebe9f115721e55fe9ca38 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Sat, 25 May 2019 12:33:05 +0200
 Subject: [PATCH] media: cedrus: Fix decoding for some H264 videos
@@ -72,5 +72,5 @@ index a30bb283f69f..fab14de1815a 100644
  	     (slice->slice_type == V4L2_H264_SLICE_TYPE_P ||
  	      slice->slice_type == V4L2_H264_SLICE_TYPE_SP)) ||
 -- 
-2.21.0
+2.20.1
 

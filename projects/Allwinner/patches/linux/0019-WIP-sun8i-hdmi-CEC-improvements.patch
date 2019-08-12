@@ -1,70 +1,7 @@
-From bf21ad0889bdcc1dc12fe5a024fd7df7ad2c4310 Mon Sep 17 00:00:00 2001
-From: Jonas Karlman <jonas@kwiboo.se>
-Date: Tue, 26 Feb 2019 20:45:14 +0000
-Subject: [PATCH 1/2] WIP: dw-hdmi-cec: sleep 100ms on error
-
----
- drivers/gpu/drm/bridge/synopsys/dw-hdmi-cec.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi-cec.c b/drivers/gpu/drm/bridge/synopsys/dw-hdmi-cec.c
-index 6c323510f128..b5a1a85c8700 100644
---- a/drivers/gpu/drm/bridge/synopsys/dw-hdmi-cec.c
-+++ b/drivers/gpu/drm/bridge/synopsys/dw-hdmi-cec.c
-@@ -7,6 +7,7 @@
-  * it under the terms of the GNU General Public License version 2 as
-  * published by the Free Software Foundation.
-  */
-+#include <linux/delay.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
- #include <linux/module.h>
-@@ -132,8 +133,15 @@ static irqreturn_t dw_hdmi_cec_hardirq(int irq, void *data)
- 
- 	dw_hdmi_write(cec, stat, HDMI_IH_CEC_STAT0);
- 
--	if (stat & CEC_STAT_ERROR_INIT) {
--		cec->tx_status = CEC_TX_STATUS_ERROR;
-+	/* Status with both done and error_initiator bits have been seen
-+	 * on Rockchip RK3328 devices, transmit attempt seems to have failed
-+	 * when this happens, report as low drive and block cec-framework
-+	 * 100ms before core retransmits the failed message, this seems to
-+	 * mitigate the issue with failed transmit attempts.
-+	 */
-+	if ((stat & (CEC_STAT_DONE|CEC_STAT_ERROR_INIT)) == (CEC_STAT_DONE|CEC_STAT_ERROR_INIT)) {
-+		pr_info("dw_hdmi_cec_hardirq: stat=%02x LOW_DRIVE\n", stat);
-+		cec->tx_status = CEC_TX_STATUS_LOW_DRIVE;
- 		cec->tx_done = true;
- 		ret = IRQ_WAKE_THREAD;
- 	} else if (stat & CEC_STAT_DONE) {
-@@ -144,6 +152,10 @@ static irqreturn_t dw_hdmi_cec_hardirq(int irq, void *data)
- 		cec->tx_status = CEC_TX_STATUS_NACK;
- 		cec->tx_done = true;
- 		ret = IRQ_WAKE_THREAD;
-+	} else if (stat & CEC_STAT_ERROR_INIT) {
-+		cec->tx_status = CEC_TX_STATUS_ERROR;
-+		cec->tx_done = true;
-+		ret = IRQ_WAKE_THREAD;
- 	}
- 
- 	if (stat & CEC_STAT_EOM) {
-@@ -176,6 +188,8 @@ static irqreturn_t dw_hdmi_cec_thread(int irq, void *data)
- 
- 	if (cec->tx_done) {
- 		cec->tx_done = false;
-+		if (cec->tx_status == CEC_TX_STATUS_LOW_DRIVE)
-+			msleep(100);
- 		cec_transmit_attempt_done(adap, cec->tx_status);
- 	}
- 	if (cec->rx_done) {
--- 
-2.21.0
-
-
-From 12f1abe2b5cee6575c6dd9cd29b17b589f044b80 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Sat, 25 May 2019 12:03:39 +0200
-Subject: [PATCH 2/2] WIP: sun8i-hdmi CEC improvements
+Subject: [PATCH] WIP: sun8i-hdmi CEC improvements
 
 Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 ---
@@ -76,10 +13,10 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
  5 files changed, 105 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
-index 09fdc9f87651..f359c4c3f1d1 100644
+index 4b95e112dc63..5a34d0e02d54 100644
 --- a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
 +++ b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
-@@ -2713,7 +2713,7 @@ __dw_hdmi_probe(struct platform_device *pdev,
+@@ -2803,7 +2803,7 @@ __dw_hdmi_probe(struct platform_device *pdev,
  		hdmi->audio = platform_device_register_full(&pdevinfo);
  	}
  
@@ -89,10 +26,10 @@ index 09fdc9f87651..f359c4c3f1d1 100644
  		cec.ops = &dw_hdmi_cec_ops;
  		cec.irq = irq;
 diff --git a/drivers/gpu/drm/sun4i/Kconfig b/drivers/gpu/drm/sun4i/Kconfig
-index 1dbbc3a1b763..7149c72e44c8 100644
+index 37e90e42943f..298b1cf61c99 100644
 --- a/drivers/gpu/drm/sun4i/Kconfig
 +++ b/drivers/gpu/drm/sun4i/Kconfig
-@@ -60,6 +60,16 @@ config DRM_SUN8I_DW_HDMI
+@@ -61,6 +61,16 @@ config DRM_SUN8I_DW_HDMI
  	  DesignWare HDMI controller with custom HDMI PHY. If M is
  	  selected the module will be called sun8i_dw_hdmi.
  
@@ -295,10 +232,10 @@ index 43643ad31730..d840bc07cba6 100644
  	clk_disable_unprepare(phy->clk_bus);
  	clk_disable_unprepare(phy->clk_phy);
 diff --git a/include/drm/bridge/dw_hdmi.h b/include/drm/bridge/dw_hdmi.h
-index 323febe7f102..cec73761856d 100644
+index ef83302bf175..3408a039c417 100644
 --- a/include/drm/bridge/dw_hdmi.h
 +++ b/include/drm/bridge/dw_hdmi.h
-@@ -144,6 +144,8 @@ struct dw_hdmi_plat_data {
+@@ -140,6 +140,8 @@ struct dw_hdmi_plat_data {
  	int (*configure_phy)(struct dw_hdmi *hdmi,
  			     const struct dw_hdmi_plat_data *pdata,
  			     unsigned long mpixelclock);
@@ -308,5 +245,5 @@ index 323febe7f102..cec73761856d 100644
  
  struct dw_hdmi *dw_hdmi_probe(struct platform_device *pdev,
 -- 
-2.21.0
+2.20.1
 

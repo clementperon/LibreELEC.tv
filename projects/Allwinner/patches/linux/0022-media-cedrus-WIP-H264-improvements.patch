@@ -1,7 +1,7 @@
-From 9714cf1bc8c5b48f21af3500e34497621b51a4b1 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Thu, 14 Feb 2019 22:50:12 +0100
-Subject: [PATCH 3/5] media: cedrus: WIP H264 improvements
+Subject: [PATCH] media: cedrus: WIP H264 improvements
 
 Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 ---
@@ -120,5 +120,5 @@ index d0ee3f90ff46..dcb8d3837869 100644
  		reg |= VE_H264_SHS_FIELD_PIC;
  	if (slice->flags & V4L2_H264_SLICE_FLAG_BOTTOM_FIELD)
 -- 
-2.21.0
+2.20.1
 

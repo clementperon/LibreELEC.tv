@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 16 Dec 2018 10:22:09 +0100
+Subject: [PATCH] drm: dw-hdmi: extract dw_hdmi_connector_update_edid()
+
+Extract code that updates EDID into a dw_hdmi_connector_update_edid() helper,
+it will be called from dw_hdmi_connector_detect().
+
+Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
+---
+ drivers/gpu/drm/bridge/synopsys/dw-hdmi.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
+index c6490949d9db..15c1f1bdb9e6 100644
+--- a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
++++ b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
+@@ -2120,7 +2120,8 @@ dw_hdmi_connector_detect(struct drm_connector *connector, bool force)
+ 	return hdmi->phy.ops->read_hpd(hdmi, hdmi->phy.data);
+ }
+ 
+-static int dw_hdmi_connector_get_modes(struct drm_connector *connector)
++static int dw_hdmi_connector_update_edid(struct drm_connector *connector,
++					  bool add_modes)
+ {
+ 	struct dw_hdmi *hdmi = container_of(connector, struct dw_hdmi,
+ 					     connector);
+@@ -2139,7 +2140,8 @@ static int dw_hdmi_connector_get_modes(struct drm_connector *connector)
+ 		hdmi->sink_has_audio = drm_detect_monitor_audio(edid);
+ 		drm_connector_update_edid_property(connector, edid);
+ 		cec_notifier_set_phys_addr_from_edid(hdmi->cec_notifier, edid);
+-		ret = drm_add_edid_modes(connector, edid);
++		if (add_modes)
++			ret = drm_add_edid_modes(connector, edid);
+ 		kfree(edid);
+ 	} else {
+ 		dev_dbg(hdmi->dev, "failed to get edid\n");
+@@ -2148,6 +2150,11 @@ static int dw_hdmi_connector_get_modes(struct drm_connector *connector)
+ 	return ret;
+ }
+ 
++static int dw_hdmi_connector_get_modes(struct drm_connector *connector)
++{
++	return dw_hdmi_connector_update_edid(connector, true);
++}
++
+ static void dw_hdmi_connector_force(struct drm_connector *connector)
+ {
+ 	struct dw_hdmi *hdmi = container_of(connector, struct dw_hdmi,
+-- 
+2.20.1
+

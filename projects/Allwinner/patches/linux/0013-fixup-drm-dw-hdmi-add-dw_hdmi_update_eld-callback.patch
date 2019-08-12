@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 16 Dec 2018 20:31:25 +0100
+Subject: [PATCH] fixup! drm: dw-hdmi: add dw_hdmi_update_eld() callback
+
+---
+ sound/soc/codecs/hdmi-codec.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/sound/soc/codecs/hdmi-codec.c b/sound/soc/codecs/hdmi-codec.c
+index 346d0d5715cd..940ffc5305ec 100644
+--- a/sound/soc/codecs/hdmi-codec.c
++++ b/sound/soc/codecs/hdmi-codec.c
+@@ -639,7 +639,9 @@ void hdmi_codec_eld_notify(struct device *dev)
+ 	struct hdmi_codec_priv *hcp = dev_get_drvdata(dev);
+ 	struct snd_ctl_elem_id id;
+ 
+-	if (!hcp->snd_card || !hcp->kctl)
++	if (!hcp ||
++	    !hcp->snd_card ||
++	    !hcp->kctl)
+ 		return;
+ 
+ 	id = hcp->kctl->id;
+-- 
+2.20.1
+

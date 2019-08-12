@@ -1,7 +1,7 @@
-From fce7f7e700176b402b303d2a62813cc0cdd061e0 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Sat, 25 May 2019 13:18:50 +0200
-Subject: [PATCH 2/5] media: cedrus: Fix H264 default reference index count
+Subject: [PATCH] media: cedrus: Fix H264 default reference index count
 
 Reference index count in VE_H264_PPS should come from PPS control.
 However, this is not really important, because reference index count is
@@ -32,5 +32,5 @@ index fab14de1815a..d0ee3f90ff46 100644
  	if (pps->flags & V4L2_H264_PPS_FLAG_ENTROPY_CODING_MODE)
  		reg |= VE_H264_PPS_ENTROPY_CODING_MODE;
 -- 
-2.21.0
+2.20.1
 
