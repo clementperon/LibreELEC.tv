@@ -2,8 +2,8 @@
 # Copyright (C) 2020-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="crust"
-PKG_VERSION="1609cb0dbb70e5698032a0e39408756467289e6e"
-PKG_SHA256="f02df0e6e50f2fb1029103f452d4e5e27f54cb1635c6ab3fca3d2ac24747844c"
+PKG_VERSION="2912afc61eda9fcfdf26f7f59504840850475847"
+PKG_SHA256="310d036b4f1ff57a7dbe34c9f85c0cc2883a47b334b286f09199f1576a7d8176"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="BSD-3c"
 PKG_SITE="https://github.com/crust-firmware/crust"
@@ -38,6 +38,7 @@ make_target() {
   fi
   # Boards with a PMIC need to disable CONFIG_PMIC_SHUTDOWN to get CIR wakeup from suspend
   echo "CONFIG_PMIC_SHUTDOWN=n" >> configs/$CRUST_CONFIG
+  echo "CONFIG_CIR=y" >> configs/$CRUST_CONFIG
   make $CRUST_CONFIG
   make scp
 }
