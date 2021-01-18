@@ -1,7 +1,7 @@
-From 57194f2f0663f7be6f068c2348437446b7abc19f Mon Sep 17 00:00:00 2001
+From 05c49ce2cc7064b69377bd100754781c8bcf1080 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Sun, 10 Jan 2021 12:08:58 +0100
-Subject: [PATCH] configs: Add Beelink GS1 defconfig
+Subject: [PATCH 1/2] configs: Add Beelink GS1 defconfig
 
 Beelink GS1 is TV box based on H6. It includes AXP805 PMIC but it has no
 power button. It comes with remote, so it's power button scancode and
@@ -25,5 +25,5 @@ index 000000000000..b95d6701de9b
 +CONFIG_CIR_WAKE_CODE=0x8051
 +CONFIG_MFD_AXP20X=y
 -- 
-2.30.0
+2.25.1
 

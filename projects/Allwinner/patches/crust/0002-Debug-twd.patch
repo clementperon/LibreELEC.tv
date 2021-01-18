@@ -1,0 +1,25 @@
+From f68778c98e43df604d2a829502af757477413fd8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Cl=C3=A9ment=20P=C3=A9ron?= <cpe@outsight.tech>
+Date: Mon, 18 Jan 2021 23:10:51 +0100
+Subject: [PATCH 2/2] Debug twd
+
+---
+ drivers/watchdog/sunxi-twd.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/watchdog/sunxi-twd.c b/drivers/watchdog/sunxi-twd.c
+index 79fe7513bfa3..4e663234b895 100644
+--- a/drivers/watchdog/sunxi-twd.c
++++ b/drivers/watchdog/sunxi-twd.c
+@@ -57,6 +57,8 @@ sunxi_twd_probe(const struct device *dev)
+ 	/* Set counter clock source to OSC24M. */
+ 	mmio_set_32(regs + TWD_CTRL_REG, BIT(31));
+ 
++	return SUCCESS;
++
+ 	/* Program a conservative default timeout. */
+ 	mmio_write_32(regs + TWD_INTV_REG, TWD_TIMEOUT);
+ 
+-- 
+2.25.1
+
