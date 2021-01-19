@@ -1,7 +1,7 @@
 From f68778c98e43df604d2a829502af757477413fd8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Cl=C3=A9ment=20P=C3=A9ron?= <cpe@outsight.tech>
 Date: Mon, 18 Jan 2021 23:10:51 +0100
-Subject: [PATCH 2/2] Debug twd
+Subject: [PATCH 2/3] Debug twd
 
 ---
  drivers/watchdog/sunxi-twd.c | 2 ++

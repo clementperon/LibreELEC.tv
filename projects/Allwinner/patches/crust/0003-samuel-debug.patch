@@ -1,0 +1,55 @@
+From efbf0daec1cf868ecfd6dda7a60147380a6088a9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Cl=C3=A9ment=20P=C3=A9ron?= <cpe@outsight.tech>
+Date: Tue, 19 Jan 2021 15:43:56 +0100
+Subject: [PATCH 3/3] samuel debug
+
+---
+ drivers/clock/sun50i-h6-ccu.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/clock/sun50i-h6-ccu.c b/drivers/clock/sun50i-h6-ccu.c
+index 98d01473dbde..84d9c3d264cc 100644
+--- a/drivers/clock/sun50i-h6-ccu.c
++++ b/drivers/clock/sun50i-h6-ccu.c
+@@ -135,6 +135,9 @@ const struct ccu ccu = {
+ 	.regs   = DEV_CCU,
+ };
+ 
++#include <debug.h>
++#include <delay.h>
++
+ void
+ ccu_suspend(void)
+ {
+@@ -143,24 +146,28 @@ ccu_suspend(void)
+ 	              CPUX_CLK_SRC(1) |
+ 	              CPUX_APB_CLK_M(3) |
+ 	              CPUX_AXI_CLK_M(2));
++	udelay(1000); log("a");
+ 
+ 	/* Set PSI/AHB1/AHB2 to LOSC/1 (32kHz). */
+ 	mmio_write_32(DEV_CCU + PSI_CFG_REG,
+ 	              PSI_CLK_SRC(1) |
+ 	              PSI_CLK_P(0) |
+ 	              PSI_CLK_M(0));
++	udelay(1000); log("b");
+ 
+ 	/* Set AHB3 to LOSC/1 (32kHz). */
+ 	mmio_write_32(DEV_CCU + AHB3_CFG_REG,
+ 	              AHB3_CLK_SRC(1) |
+ 	              AHB3_CLK_P(0) |
+ 	              AHB3_CLK_M(0));
++	udelay(1000); log("c");
+ 
+ 	/* Set APB1 to LOSC/2 (16kHz). */
+ 	mmio_write_32(DEV_CCU + APB1_CFG_REG,
+ 	              APB1_CLK_SRC(1) |
+ 	              APB1_CLK_P(1) |
+ 	              APB1_CLK_M(0));
++	udelay(1000); log("d");
+ }
+ 
+ void
+-- 
+2.25.1
+
